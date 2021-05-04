@@ -11,9 +11,11 @@ public class DiskSchedule {
 	    System.out.println("FCFS: " + FCFS(requests,head));
 	    System.out.println("SSTF: " + SSTF(requests,head));
 	    System.out.println("SCAN: " + SCAN(requests,head));
+        System.out.println("C-SCAN: " + C_SCAN(requests,head));
+        System.out.println("LOOK: " + LOOK(requests,head));
+        System.out.println("C-LOOK: " + C_LOOK(requests,head));
 	}
 
-	//First Come First Serve
 	public static int FCFS(int[] requests, int head) {
 		int head_movements = 0;
         for(int i = 0; i < requests.length; i++) {
@@ -23,7 +25,6 @@ public class DiskSchedule {
         return head_movements;
 	}
 
-	//Shortest Seek Time First
 	public static int SSTF(int [] requests, int head) {
         int head_movements = 0;
         int tracker = 0;
@@ -77,13 +78,13 @@ public class DiskSchedule {
             head = temp.get(i);
         }
 
+        head_movements += 4999 - head;
+
         //iterate backwards to get the remaining requests (left side)
         for(int i = position - 1; i >= 0; i--) {
             head_movements += Math.abs(temp.get(i) - head);
         }
 
-    	int last = temp.get(temp.size() - 1);
-    	head_movements += 4999 - last;
     	return head_movements;
     }
 
@@ -112,8 +113,7 @@ public class DiskSchedule {
     //         head = temp.get(i);
     //     }
 
-    //     int first = temp.get(0);
-    //     head_movements += 0 + first;
+    //     head_movements += 0 + head;
     //     head = 0;
 
     //     //going to the right side first
@@ -125,6 +125,112 @@ public class DiskSchedule {
     //     return head_movements;
     // }
 
+    public static int C_SCAN(int[] requests, int head) {
+        int head_movements = 0;
+        int position = 0;
+        ArrayList <Integer> temp = new ArrayList<Integer>();
+
+        for (int i = 0; i < requests.length; i++) {
+            temp.add(requests[i]);
+        }
+        Collections.sort(temp); //sort the list in ascending order
+
+        //get position of first biggest request so you know where to start off at second time going back
+        for(int i = 0; i < temp.size(); i++) {
+            if(temp.get(i) >= head) {
+                position = i;
+                break;
+            }
+        }
+
+        //going to the right side first
+        for(int i = position; i < temp.size(); i++) {
+            head_movements += Math.abs(temp.get(i) - head);
+            head = temp.get(i);
+        }
+
+        head_movements += 4999 - head;
+        head = 0;
+        head_movements += 4999 - head;
+
+        //going to the right side again
+        for(int i = 0; i < position; i++) {
+            head_movements += Math.abs(temp.get(i) - head);
+            head = temp.get(i);
+        }
+
+        return head_movements;
+    }
+
+    public static int LOOK(int[] requests, int head) {
+
+        int head_movements = 0;
+        int position = 0;
+        ArrayList <Integer> temp = new ArrayList<Integer>();
+
+        for (int i = 0; i < requests.length; i++) {
+            temp.add(requests[i]);
+        }
+        Collections.sort(temp); //sort the list in ascending order
+
+        //get position of first biggest request so you know where to start off at second time going back
+        for(int i = 0; i < temp.size(); i++) {
+            if(temp.get(i) >= head) {
+                position = i;
+                break;
+            }
+        }
+
+        //going to the right side first
+        for(int i = position; i < temp.size(); i++) {
+            head_movements += Math.abs(temp.get(i) - head);
+            head = temp.get(i);
+        }
+
+        //going to the left side now
+        for(int i = position - 1; i >= 0; i--) {
+            head_movements += Math.abs(temp.get(i) - head);
+        }
+
+        return head_movements;
+    }
+
+    public static int C_LOOK(int[] requests, int head) {
+
+        int head_movements = 0;
+        int position = 0;
+        ArrayList <Integer> temp = new ArrayList<Integer>();
+
+        for (int i = 0; i < requests.length; i++) {
+            temp.add(requests[i]);
+        }
+        Collections.sort(temp); //sort the list in ascending order
+
+        //get position of first biggest request so you know where to start off at second time going back
+        for(int i = 0; i < temp.size(); i++) {
+            if(temp.get(i) >= head) {
+                position = i;
+                break;
+            }
+        }
+
+        //going to the right side first
+        for(int i = position; i < temp.size(); i++) {
+            head_movements += Math.abs(temp.get(i) - head);
+            head = temp.get(i);
+        }
+
+        head = 0;
+
+        //going to the right side again
+        for(int i = 0; i < position; i++) {
+            head_movements += Math.abs(temp.get(i) - head);
+            head = temp.get(i);
+        }
+
+        return head_movements;
+
+    }
 }
 	
 
