@@ -1,45 +1,43 @@
 import java.util.*;
 
 public class DiskSchedule {
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		int head = 53;	
-		// int requests[] = {4078, 153, 2819, 3294, 1433, 211, 1594, 2004, 2335, 2007, 771, 1043, 3950, 2784, 1881,
-	 //        2931, 3599, 1245, 4086, 520, 3901, 2866, 947, 3794, 2353, 3970, 3948, 1815, 4621, 372, 2684, 3088, 
-	 //        827, 3126, 2083, 584, 4420, 1294, 917, 2881, 3659, 2868, 100, 1581, 4581, 1664, 1001, 1213, 3439, 4706};
+        int head = 50; 
+        int requests[] = {82,170,43,140,24,16,190};
+        int max = 199; 
 
-		int requests[] = {98,183,37,122,14,124,65,67};
-		int max = 199; 
-
-	    System.out.println("FCFS: " + FCFS(requests,head));
-	    System.out.println();
-	    System.out.println("SSTF: " + SSTF(requests,head));
-	    System.out.println();
-	    System.out.println("SCAN: " + SCAN(requests,head,max));
-	    System.out.println();		
+        System.out.println("FCFS: " + FCFS(requests,head));
+        System.out.println();
+        System.out.println("SSTF: " + SSTF(requests,head));
+        System.out.println();
+        System.out.println("SCAN LEFT: " + SCAN_LEFT(requests,head));
+        System.out.println();
+        System.out.println("SCAN RIGHT: " + SCAN_RIGHT(requests,head,max));
+        System.out.println();
         System.out.println("C-SCAN: " + C_SCAN(requests,head,max));
         System.out.println();
         System.out.println("LOOK: " + LOOK(requests,head));
         System.out.println();
         System.out.println("C-LOOK: " + C_LOOK(requests,head));
-        System.out.println();
-	}
+        
+    }
 
-	public static int FCFS(int[] requests, int head) {
-		int head_movements = 0;
+    public static int FCFS(int[] requests, int head) {
+        int head_movements = 0;
         for(int i = 0; i < requests.length; i++) {
-        	if(i == requests.length - 1) 
-        		System.out.print("(|" + head + " - " + requests[i] + "|)");	
-        	else 
-        		System.out.print("(|" + head + " - " + requests[i] + "|) + ");
+            if(i == requests.length - 1) 
+                System.out.print("(|" + head + " - " + requests[i] + "|)"); 
+            else 
+                System.out.print("(|" + head + " - " + requests[i] + "|) + ");
             head_movements += Math.abs(head - requests[i]);
             head = requests[i];
         }
         System.out.println();
         return head_movements;
-	}
+    }
 
-	public static int SSTF(int [] requests, int head) {
+    public static int SSTF(int [] requests, int head) {
         int head_movements = 0;
         int tracker = 0;
         ArrayList <Integer> temp = new ArrayList<Integer>();
@@ -54,7 +52,7 @@ public class DiskSchedule {
 
             for (int i = 0; i < temp.size(); i++) {
                 if (Math.abs(temp.get(i) - head) < shortest) {
-                    shortest = Math.abs(temp.get(i) - head);
+                    shortest = Math.abs(head - temp.get(i));
                     position = i;
                 }
             }
@@ -70,89 +68,45 @@ public class DiskSchedule {
         return head_movements;
     }
 
-    //IF DIRECTION IS TO THE RIGHT
-    public static int SCAN(int [] requests, int head, int max) {
-    	int head_movements = 0;
+    // IF DIRECTION IS TO THE LEFT
+    public static int SCAN_LEFT(int [] requests, int head) {
+        int head_movements = 0;
         int position = 0;
-		ArrayList <Integer> temp = new ArrayList<Integer>();
+        ArrayList <Integer> temp = new ArrayList<Integer>();
 
         for (int i = 0; i < requests.length; i++) {
             temp.add(requests[i]);
         }
-    	Collections.sort(temp); //sort the list in ascending order
+        Collections.sort(temp); //sort the list in ascending order
 
-        //get position of first biggest request so you know where to start off at second time going back
-    	for(int i = 0; i < temp.size(); i++) {
-    		if(temp.get(i) >= head) {
-                position = i;
-                break;
-            }
-    	}
-        
-        //going to the right side first
-        for(int i = position; i < temp.size(); i++) {
-        	System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-            head_movements += Math.abs(temp.get(i) - head);
-            head = temp.get(i);
-        }
-
-        head_movements += max - head;
-        System.out.print("(|" + max + " - " + head + "|) + ");
-
-        //iterate backwards to get the remaining requests (left side)
-        for(int i = position - 1; i >= 0; i--) {
-        	if(i == 0)
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|)");
-        	else
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-            head_movements += Math.abs(temp.get(i) - head);
-        }
+        head_movements += Math.abs(head - 0);
+        System.out.print("(|" + head + " - " + 0 + "|) + ");
+        head_movements += Math.abs(0 - temp.get(temp.size() - 1));
+        System.out.print("(|" + 0 + " - " + temp.get(temp.size() - 1) + "|)");
         System.out.println();
-    	return head_movements;
+        return head_movements;
     }
 
-    // IF DIRECTION IS TO THE LEFT
-    // public static int SCAN(int [] requests, int head) {
-    //     int head_movements = 0;
-    //     int position = 0;
-    //     ArrayList <Integer> temp = new ArrayList<Integer>();
+    //IF DIRECTION IS TO THE RIGHT
+    public static int SCAN_RIGHT(int [] requests, int head, int max) {
+        int head_movements = 0;
+        int position = 0;
+        ArrayList <Integer> temp = new ArrayList<Integer>();
 
-    //     for (int i = 0; i < requests.length; i++) {
-    //         temp.add(requests[i]);
-    //     }
-    //     Collections.sort(temp); //sort the list in ascending order
+        for (int i = 0; i < requests.length; i++) {
+            temp.add(requests[i]);
+        }
 
-    //     //get position of first biggest request so you know where to start off at second time going back
-    //     for(int i = 0; i < temp.size(); i++) {
-    //         if(temp.get(i) >= head) {
-    //             position = i - 1;
-    //             break;
-    //         }
-    //     }
+        Collections.sort(temp); //sort the list in ascending order
 
-    //     //iterate backwards to get the remaining requests (left side)
-    //     for(int i = position - 1; i >= 0; i--) {
-    //     	System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-    //         head_movements += Math.abs(temp.get(i) - head);
-    //         head = temp.get(i);
-    //     }
+        head_movements += Math.abs(head - max);
+        System.out.print("(|" + head + " - " + max + "|) + ");
+        head_movements += Math.abs(max - temp.get(0));
+        System.out.print("(|" + max + " - " + temp.get(0) + "|)");
+        System.out.println();
+        return head_movements;
+    }
 
-    //     head_movements += 0 + head;
-    //     System.out.print("(|" + max + " - " + head + "|) + ");
-    //     head = 0;
-
-    //     //going to the right side first
-    //     for(int i = position; i < temp.size(); i++) {
-    //     	if(i == 0)
-    //     		System.out.print("(|" + head + " - " + temp.get(i) + "|)");
-    //     	else
-    //     		System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-    //         head_movements += Math.abs(temp.get(i) - head);
-    //         head = temp.get(i);
-    //     }
-
-    //     return head_movements;
-    // }
 
     public static int C_SCAN(int[] requests, int head, int max) {
         int head_movements = 0;
@@ -174,7 +128,7 @@ public class DiskSchedule {
 
         //going to the right side first
         for(int i = position; i < temp.size(); i++) {
-        	System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
+            System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
             head_movements += Math.abs(temp.get(i) - head);
             head = temp.get(i);
         }
@@ -187,10 +141,10 @@ public class DiskSchedule {
 
         //going to the right side again
         for(int i = 0; i < position; i++) {
-        	if(i == position - 1)
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|)");
-        	else
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
+            if(i == position - 1)
+                System.out.print("(|" + head + " - " + temp.get(i) + "|)");
+            else
+                System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
             head_movements += Math.abs(temp.get(i) - head);
             head = temp.get(i);
         }
@@ -209,29 +163,11 @@ public class DiskSchedule {
         }
         Collections.sort(temp); //sort the list in ascending order
 
-        //get position of first biggest request so you know where to start off at second time going back
-        for(int i = 0; i < temp.size(); i++) {
-            if(temp.get(i) >= head) {
-                position = i;
-                break;
-            }
-        }
+        head_movements += Math.abs(temp.get(temp.size() - 1) - head);
+        System.out.print("(|" + head + " - " + temp.get(temp.size() - 1) + "|) + ");
+        head_movements += Math.abs(temp.get(temp.size() - 1) - temp.get(0));
+        System.out.print("(|" + temp.get(0) + " - " + temp.get(temp.size() - 1) + "|)");
 
-        //going to the right side first
-        for(int i = position; i < temp.size(); i++) {
-        	System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-            head_movements += Math.abs(temp.get(i) - head);
-            head = temp.get(i);
-        }
-
-        //going to the left side now
-        for(int i = position - 1; i >= 0; i--) {
-        	if(i == 0)
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|)");
-        	else
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-            head_movements += Math.abs(temp.get(i) - head);
-        }
         System.out.println();
         return head_movements;
     }
@@ -249,36 +185,30 @@ public class DiskSchedule {
 
         //get position of first biggest request so you know where to start off at second time going back
         for(int i = 0; i < temp.size(); i++) {
-            if(temp.get(i) >= head) {
+            if(temp.get(i) <= head) {
                 position = i;
                 break;
             }
         }
 
-        //going to the right side first
-        for(int i = position; i < temp.size(); i++) {
-        	System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-            head_movements += Math.abs(temp.get(i) - head);
-            head = temp.get(i);
+        head_movements += Math.abs(temp.get(temp.size() - 1) - head);
+        System.out.print("(|" + head + " - " + temp.get(temp.size() - 1) + "|) + ");
+        head_movements += Math.abs(temp.get(temp.size() - 1) - temp.get(0)); 
+        System.out.print("(|" + temp.get(0) + " - " + temp.get(temp.size() - 1) + "|)");       
+
+        temp.add(head);
+        Collections.sort(temp);
+        for(int i = 0; i < temp.size(); i++) {
+            if(temp.get(i) == 50) 
+                position = i - 1;
         }
 
-        head = 0;
-
-        //going to the right side again
-        for(int i = 0; i < position; i++) {
-        	if(i == position - 1)
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|)");
-        	else
-        		System.out.print("(|" + head + " - " + temp.get(i) + "|) + ");
-            head_movements += Math.abs(temp.get(i) - head);
-            head = temp.get(i);
-        }
-
+        head_movements += Math.abs(temp.get(0) - temp.get(position)); 
         System.out.println();
         return head_movements;
 
     }
 }
-	
+    
 
 
